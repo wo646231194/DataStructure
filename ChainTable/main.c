@@ -143,6 +143,7 @@ LinkList findx(LinkList L,int x){
         N = N->next;
     }
     printf("没有找到\n");
+    return 0;
 }
 /*------------------------------插入：前插---------------------------*/
 int insert_before(LinkList L,int i, int x){
@@ -158,6 +159,7 @@ int insert_before(LinkList L,int i, int x){
         }
         L=L->next;
     }
+    return 1;
 }
 /*------------------------------插入：后插---------------------------*/
 int insert_after(LinkList L,int i, int x){
@@ -173,6 +175,7 @@ int insert_after(LinkList L,int i, int x){
             L->next = T;
         }
     }
+    return 1;
 }
 /*-------------------------------删除------------------------------*/
 int delete(LinkList L, int i){
@@ -188,23 +191,60 @@ int delete(LinkList L, int i){
         }
         L=L->next;
     }
+    return 1;
+}
+/*---------------------------链表倒置-------------------------------*/
+LinkList reverse(LinkList H){
+    printf("++++链表倒置++++\n");
+    LinkList E,T,tmp=NULL;
+    int j=1;
+    E = H->next;
+    while (E){
+        T = malloc(sizeof(LinkList));
+        T->x = E->x;
+        T->next = tmp;
+        tmp = T;
+        E = E->next;
+        H->next = T;
+    }
+    return H;
+}
+/*---------------------------链表去重复-----------------------------*/
+LinkList redundant(LinkList H){
+    printf("++++链表去重复++++\n");
+    LinkList E,T,r;
+    E = H->next;
+    while (E->next!=NULL){
+        T = E;
+        while (T->next!=NULL){
+            if(E->x == T->next->x){
+                r = T->next;
+                T->next = r->next;
+                free(r);
+            } else{
+                T = T->next;
+            }
+        }
+        E = E->next;
+    }
+    return H;
 }
 
 /*--------------------------------------主函数-----------------------------*/
 void main(){
-    printf("------------------------\n开始头部插入\n");
-    LinkList L1 = init_list1(); //初始化
-    print_list1(L1); //显示所有元素
-    getLength(L1,1); //获取链表长度
-    findi(L1,1,1); //按序号查找
-    printf("头部插入结束\n------------------------\n\n");
-
-    printf("------------------------\n开始尾部插入\n");
-    LinkList L2 = init_list2(); //初始化
-    print_list2(L2); //显示所有元素
-    getLength(L2,2); //获取链表长度
-    findi(L2,1,2); //按序号查找
-    printf("尾部插入结束\n------------------------\n\n");
+//    printf("------------------------\n开始头部插入\n");
+//    LinkList L1 = init_list1(); //初始化
+//    print_list1(L1); //显示所有元素
+//    getLength(L1,1); //获取链表长度
+//    findi(L1,1,1); //按序号查找
+//    printf("头部插入结束\n------------------------\n\n");
+//
+//    printf("------------------------\n开始尾部插入\n");
+//    LinkList L2 = init_list2(); //初始化
+//    print_list2(L2); //显示所有元素
+//    getLength(L2,2); //获取链表长度
+//    findi(L2,1,2); //按序号查找
+//    printf("尾部插入结束\n------------------------\n\n");
 
     printf("------------------------\n带头节点的链表\n");
     LinkList L3 = init_list3();
@@ -219,5 +259,9 @@ void main(){
     findx(L3,34); //按值查找
     delete(L3,1);
     print_list3(L3); //显示
+    reverse(L3);
+    print_list3(L3);
+    redundant(L3);
+    print_list3(L3);
     printf("带头节点链表结束\n------------------------\n\n");
 }
