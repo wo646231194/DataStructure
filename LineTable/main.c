@@ -113,6 +113,23 @@ void sort(List *L, int type){
     show(L);
 }
 
+void merge(List *L1,List *L2,List *L3){
+    int i=0,j=0,k=0;
+    if(i<L1->last && i<L2->last){
+        if(L1->data[i]<L2->data[i])
+            L3->data[k++] = L1->data[i++];
+        else
+            L3->data[k++] = L2->data[j++];
+    }
+    while (i<L1->last){
+        L3->data[k++] = L1->data[i++];
+    }
+    while (j<L2->last){
+        L3->data[k++] = L2->data[j++];
+    }
+    L3->last = k-1;
+}
+
 main(){
     List * L;
     L = init();
