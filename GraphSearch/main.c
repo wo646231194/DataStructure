@@ -12,6 +12,10 @@ typedef struct q{
     Qnode *end;
 }Q;
 
+typedef struct s{
+    Qnode *top;
+}S;
+
 typedef struct g{
     int value[MAX_NODE][MAX_NODE];
     int length;
@@ -32,7 +36,8 @@ void connect(G *g, int x, int y){
     }
     g->value[x][y] = 1;
     g->value[y][x] = 1;
-    g->length = x>y?(x+1):(y+1);
+    g->length = g->length>x?g->length:(x+1);
+    g->length = g->length>y?g->length:(y+1);
 }
 
 void printG (const G *g){
@@ -53,6 +58,15 @@ void printQ (const Q *q){
     printf("\n");
 }
 
+void printS (const S *s){
+    Qnode *n = s->top;
+    while (n->next!=NULL){
+        printf("%d ", n->value);
+        n = n->next;
+    }
+    printf("\n");
+}
+
 void initQ (Q *q){
     Qnode *n = malloc(sizeof(Qnode));
     n->next = NULL;
@@ -60,7 +74,7 @@ void initQ (Q *q){
     q->end = n;
 }
 
-void push (Q *q, int value){
+void pushQ (Q *q, int value){
     Qnode *n = malloc(sizeof(Qnode));
     n->next = NULL;
     n->value = 0;
@@ -69,9 +83,11 @@ void push (Q *q, int value){
     q->end = n;
 }
 
-int pop (Q *q){
+int popQ (Q *q){
     int value = q->head->value;
+    Qnode *n = q->head;
     q->head = q->head->next;
+    free(n);
     return value;
 }
 
@@ -84,12 +100,42 @@ int isInQueue(Q *q, int v){
     return 0;
 }
 
-void breadIter(G *g, Q *q, int s){
+void initS(S *s){
+    Qnode *n = malloc(sizeof(Qnode));
+    n->next = NULL;
+    s->top = n;
+}
+
+void pushS(S *s, int v){
+    Qnode *n = malloc(sizeof(Qnode));
+    n->next = s->top;
+    n->value = v;
+    s->top = n;
+}
+
+int popS(S *s){
+    int value = s->top->value;
+    Qnode *n = s->top;
+    s->top = s->top->next;
+    free(n);
+    return value;
+}
+
+int isInStack(S *s, int v){
+    Qnode *n = s->top;
+    while (n->next!=NULL){
+        if(n->value == v) return 1;
+        n = n->next;
+    }
+    return 0;
+}
+
+void breadIter(G *g, Q *q, int source){
     int count = 0;
     for(int i=0; i<g->length; ++i){
-        int v = g->value[s][i];
+        int v = g->value[source][i];
         if(v && !isInQueue(q, i)){
-            push(q, i);
+            pushQ(q, i);
             count ++;
         }
     }
@@ -101,41 +147,70 @@ void breadIter(G *g, Q *q, int s){
     }
 }
 
-void BFS(G *g, int s){
+void deepIter(G *g, Q *q, int source){
+    for(int i=0; i<g->length; ++i){
+        int v = g->value[source][i];
+        if(v && !isInStack(q, i)){
+            pushQ(q, i);
+            deepIter(g, q, i);
+        }
+    }
+}
+
+void BFS(G *g, int source){
     Q q;
     initQ(&q);
-    push(&q, s);
-    breadIter(g, &q, s);
+    pushQ(&q, source);
+    breadIter(g, &q, source);
+    printQ(&q);
+}
+
+void DFS(G *g, int source){
+    Q q;
+    initQ(&q);
+    pushQ(&q, source);
+    deepIter(g, &q, source);
     printQ(&q);
 }
 
 int main(){
     G graph;
     Q queue;
+    S stack;
     initG(&graph);
     initQ(&queue);
+    initS(&stack);
 
     connect(&graph, 0, 1);
     connect(&graph, 0, 2);
-    connect(&graph, 0, 3);
-    connect(&graph, 0, 5);
-
-    connect(&graph, 1, 5);
-    connect(&graph, 2, 4);
-    connect(&graph, 3, 4);
-    connect(&graph, 3, 5);
+    connect(&graph, 1, 3);
+    connect(&graph, 1, 4);
+    connect(&graph, 2, 5);
+    connect(&graph, 2, 6);
+    connect(&graph, 3, 7);
+    connect(&graph, 4, 7);
+    connect(&graph, 5, 6);
 
     printG(&graph);
 
-    push(&queue, 1);
-    push(&queue, 2);
-    push(&queue, 3);
-    push(&queue, 4);
+    pushQ(&queue, 1);
+    pushQ(&queue, 2);
+    pushQ(&queue, 3);
+    pushQ(&queue, 4);
 
     printQ(&queue);
-    pop(&queue);
+    popQ(&queue);
     printQ(&queue);
+
+    pushS(&stack, 1);
+    pushS(&stack, 2);
+    pushS(&stack, 3);
+    pushS(&stack, 4);
+
+    printS(&stack);
+    popS(&stack);
+    printS(&stack);
 
     BFS(&graph, 0);
+    DFS(&graph, 0);
 }
-
